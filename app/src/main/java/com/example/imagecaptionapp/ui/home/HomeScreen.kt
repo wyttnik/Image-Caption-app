@@ -3,10 +3,8 @@ package com.example.imagecaptionapp.ui.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,7 +41,6 @@ import com.example.imagecaptionapp.General.currentImageUri
 import com.example.imagecaptionapp.General.deleteCacheDir
 import com.example.imagecaptionapp.General.uri
 import com.example.imagecaptionapp.R
-
 import com.example.imagecaptionapp.ui.AppViewModelProvider
 import com.example.imagecaptionapp.ui.TopAppBar
 import com.example.imagecaptionapp.ui.navigation.NavigationDestination
@@ -91,7 +88,6 @@ fun HomeScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 private fun HomeBody(
     onItemClick: () -> Unit, modifier: Modifier = Modifier,
@@ -101,8 +97,10 @@ private fun HomeBody(
     val context = LocalContext.current
 
     var capturedImageUri by remember {
-        mutableStateOf<Uri>(Uri.EMPTY)
+        mutableStateOf(Uri.EMPTY)
     }
+    if (currentImageUri != capturedImageUri)
+        capturedImageUri = currentImageUri
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
         if (it) {
@@ -115,11 +113,10 @@ private fun HomeBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        if (currentImageUri.path?.isNotEmpty() == true) {
+        if (capturedImageUri.path?.isNotEmpty() == true) {
             val conf = LocalConfiguration.current
             AsyncImage(
-                model = if (capturedImageUri.path?.isNotEmpty() == true) capturedImageUri
-                    else currentImageUri,
+                model = capturedImageUri,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.height(conf.screenWidthDp.dp).width(conf.screenWidthDp.dp)
